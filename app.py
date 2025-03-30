@@ -76,6 +76,8 @@ def upload_file():
 
         features_list = [extract_features(seg) for seg in segments]
         feature_df = features_to_dataframe(features_list)
+        abs_cols = [col for col in feature_df.columns if 'abs' in col.lower()]
+        feature_df = feature_df[abs_cols]
         predictions = model.predict(feature_df)
 
         labels = ["walking" if p == 0 else "jumping" for p in predictions]
