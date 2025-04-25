@@ -76,7 +76,23 @@ def upload_file():
 
         features_list = [extract_features(seg) for seg in segments]
         feature_df = features_to_dataframe(features_list)
-        predictions = model.predict(feature_df)
+        num_axes = 4  # x, y, z, abs
+
+        # Use modulus to extract features for each axis separately
+        # This works because our columns are organized such that:
+        # Column 0, 4, 8... are x-axis features
+        # Column 1, 5, 9... are y-axis features
+        # Column 2, 6, 10... are z-axis features
+        # Column 3, 7, 11... are abs-axis features
+        x_cols   = [col for i, col in enumerate(feature_df) if i % num_axes == 0]
+        y_cols   = [col for i, col in enumerate(feature_df) if i % num_axes == 1]
+        z_cols   = [col for i, col in enumerate(feature_df) if i % num_axes == 2]
+        abs_cols = [col for i, col in enumerate(feature_df) if i % num_axes == 3]
+
+
+        # Reorganize final dataset to group features by axis type
+        final_dataset = final_dataset[x_cols + y_cols + z_cols + abs_cols + ['activity']]
+        predictions = model.predict(final_dataset)
 
         labels = ["walking" if p == 0 else "jumping" for p in predictions]
         jumping_count, walking_count = np.sum(predictions == 1), np.sum(predictions == 0)
