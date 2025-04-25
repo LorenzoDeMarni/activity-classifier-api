@@ -91,7 +91,7 @@ def upload_file():
 
 
         # Reorganize final dataset to group features by axis type
-        final_dataset = final_dataset[x_cols + y_cols + z_cols + abs_cols + ['activity']]
+        final_dataset = final_dataset[x_cols + y_cols + z_cols + abs_cols]
         predictions = model.predict(final_dataset)
 
         labels = ["walking" if p == 0 else "jumping" for p in predictions]
